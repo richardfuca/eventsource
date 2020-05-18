@@ -327,11 +327,15 @@ export default class EventSource extends EventEmitter {
 
   private onConnectionClosed(message?: string, error?: Error): void {
     if (this._readyState === EventSourceReadyState.CLOSED) return;
+
     this._readyState = EventSourceReadyState.CONNECTING;
 
     this.emit('error', { type: 'error', error, message });
 
-    if (this.reconnectionInterval === 0) return;
+    if (this.reconnectionInterval === 0) {
+      this._readyState = EventSourceReadyState.CLOSED;
+      return;
+    };
 
     this._url = this.originalUrl;
 

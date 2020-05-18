@@ -162,7 +162,7 @@
         "affectsGlobalScope": false
       },
       "../src/eventsource.ts": {
-        "version": "81c9e0342e7b3fa829c79b8bcc752851dc1374ee3d08bff22a142df7e56cd129",
+        "version": "5db6092a81ce29fdf0b73c2e2f9885b114e7da76bba7b01eaae7e64641dee49b",
         "signature": "69b439386c9fffed4a43c97d7b64924400f3d62be019491918ded733820b7a95",
         "affectsGlobalScope": false
       },

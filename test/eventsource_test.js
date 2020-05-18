@@ -860,6 +860,43 @@ describe('Reconnection', function () {
     })
   })
 
+  it('is not attempted when reconnectionInterval is 0', function (done) {
+    var es = new EventSource('http://localhost:' + _port, {
+      reconnectionInterval: 0
+    })
+
+    es.onerror = function () {
+      es.onerror = null
+      process.nextTick(() => {
+        assert.equal(EventSource.CLOSED, es.readyState)
+        done()
+      })
+    }
+  })
+
+  it('is attempted with custom reconnection interval', function (done) {
+    var es = new EventSource('http://localhost:' + _port, {
+      reconnectionInterval: 125
+    })
+
+    es.onerror = function () {
+      const time = Date.now()
+      es.onerror = null
+      createServer(function (err, server) {
+        if (err) return done(err)
+
+        server.on('request', writeEvents(['data: hello\n\n']))
+
+        es.onmessage = function (m) {
+          assert.equal('hello', m.data)
+          assert.ok(time < Date.now() - 100)
+          es.close()
+          server.close(done)
+        }
+      })
+    }
+  })
+
   it('sends Last-Event-ID http header when it has previously been passed in an event from the server', function (done) {
     createServer(function (err, server) {
       if (err) return done(err)

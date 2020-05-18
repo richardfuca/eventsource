@@ -335,7 +335,7 @@ export default class EventSource extends EventEmitter {
     if (this.reconnectionInterval === 0) {
       this._readyState = EventSourceReadyState.CLOSED;
       return;
-    };
+    }
 
     this._url = this.originalUrl;
 

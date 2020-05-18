@@ -1,39 +1,12 @@
-# EventSource [![npm version](http://img.shields.io/npm/v/eventsource.svg?style=flat-square)](http://browsenpm.org/package/eventsource)[![Build Status](http://img.shields.io/travis/EventSource/eventsource/master.svg?style=flat-square)](https://travis-ci.org/EventSource/eventsource)[![NPM Downloads](https://img.shields.io/npm/dm/eventsource.svg?style=flat-square)](http://npm-stat.com/charts.html?package=eventsource&from=2015-09-01)[![Dependencies](https://img.shields.io/david/EventSource/eventsource.svg?style=flat-square)](https://david-dm.org/EventSource/eventsource)
+# EventSource
 
 This library is a pure JavaScript implementation of the [EventSource](https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events) client. The API aims to be W3C compatible.
 
-You can use it with Node.js or as a browser polyfill for
-[browsers that don't have native `EventSource` support](http://caniuse.com/#feat=eventsource).
+You can use it with Node.js.  Use the [original package](https://github.com/EventSource/eventsource) for the browser polyfill.
 
 ## Install
 
     npm install eventsource
-
-## Example
-
-    npm install
-    node ./example/sse-server.js
-    node ./example/sse-client.js    # Node.js client
-    open http://localhost:8080      # Browser client - both native and polyfill
-    curl http://localhost:8080/sse  # Enjoy the simplicity of SSE
-
-## Browser Polyfill
-
-Just add `example/eventsource-polyfill.js` file to your web page:
-
-```html
-<script src=/eventsource-polyfill.js></script>
-```
-
-Now you will have two global constructors:
-
-```javascript
-window.EventSourcePolyfill
-window.EventSource // Unchanged if browser has defined it. Otherwise, same as window.EventSourcePolyfill
-```
-
-If you're using [webpack](https://webpack.github.io/) or [browserify](http://browserify.org/)
-you can of course build your own. (The `example/eventsource-polyfill.js` is built with webpack).
 
 ## Extensions to the W3C API
 

@@ -1,0 +1,26 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2016",
+    "noImplicitAny": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "noUnusedLocals": true,
+    "importHelpers": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "allowJs": false,
+    "incremental": true,
+    "outDir": "lib"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}

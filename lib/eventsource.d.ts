@@ -54,7 +54,7 @@ export default class EventSource extends EventEmitter {
     set onerror(callback: EventListener);
     set onmessage(callback: EventListener);
     set onopen(callback: EventListener);
-    dispatchEvent(event: string | symbol, ...args: unknown[]): void;
+    dispatchEvent(event: any): void;
     addEventListener(event: string | symbol, listener: (...args: unknown[]) => void): void;
     removeEventListener(event: string | symbol, listener: (...args: unknown[]) => void): void;
     close(): void;

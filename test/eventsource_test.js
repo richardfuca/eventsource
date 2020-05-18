@@ -50,6 +50,9 @@ function createHttpsServerWithClientAuth (callback) {
 }
 
 function configureServer (server, protocol, port, callback) {
+  if (port > 20010) {
+    _port = 20000;
+  }
   var responses = []
 
   var oldClose = server.close
@@ -1006,6 +1009,7 @@ describe('readyState', function () {
           es.onerror = function () {
             es.onerror = null
             assert.equal(EventSource.CONNECTING, es.readyState)
+            es.close()
             done()
           }
         })
@@ -1038,7 +1042,6 @@ describe('readyState', function () {
       es.onopen = function () {
         es.close()
         assert.equal(EventSource.CLOSED, es.readyState)
-        es.close()        
         server.close(done)
       }
     })
@@ -1052,7 +1055,8 @@ describe('Methods', function () {
       server.on('request', writeEvents([]))
       var es = new EventSource(server.url, { reconnectionInterval: 0 })
       es.onopen = function () {
-        assert.equal(es.close(), undefined)
+        const closeRes = es.close()
+        assert.equal(closeRes, undefined)
         assert.equal(es.readyState, EventSource.CLOSED)
         server.close(done)
       }

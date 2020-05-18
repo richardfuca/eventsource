@@ -43,7 +43,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src/**",
+    "lint": "eslint src/**.ts",
     "test": "mocha --reporter spec",
     "postpublish": "git push && git push --tags",
     "coverage": "nyc --reporter=html --reporter=text _mocha --reporter spec"

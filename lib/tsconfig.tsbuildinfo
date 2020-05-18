@@ -162,8 +162,8 @@
         "affectsGlobalScope": false
       },
       "../src/eventsource.ts": {
-        "version": "b670b42313011f9d263f8cfd1c4328d3e3b33f6fc1fdc27dcdf05b8f0a350bdf",
-        "signature": "fe9e157a0008be913f838c2f8f89f67e02b9a454c7aa02de735dd3e26d741c46",
+        "version": "81c9e0342e7b3fa829c79b8bcc752851dc1374ee3d08bff22a142df7e56cd129",
+        "signature": "69b439386c9fffed4a43c97d7b64924400f3d62be019491918ded733820b7a95",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/color-name/index.d.ts": {
@@ -1066,6 +1066,7 @@
         "../node_modules/@types/node/https.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/ts3.7/assert.d.ts",
         "../node_modules/@types/node/url.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/original/index.d.ts"

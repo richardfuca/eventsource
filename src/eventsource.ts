@@ -3,6 +3,7 @@ import { parse } from 'url';
 import { EventEmitter } from 'events';
 import https from 'https';
 import http from 'http';
+import assert from 'assert';
 
 export enum EventSourceReadyState {
   /** The connection has not yet been established, or it was closed and the user agent is reconnecting. */
@@ -378,8 +379,10 @@ export default class EventSource extends EventEmitter {
     }
   }
 
-  dispatchEvent(event: string | symbol, ...args: unknown[]): void {
-    this.emit(event, ...args);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dispatchEvent(event: any): void {
+    assert(event.type);
+    this.emit(event.type, event.detail || event);
   }
 
   addEventListener(event: string | symbol, listener: (...args: unknown[]) => void): void {

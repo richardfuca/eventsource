@@ -1,444 +1,404 @@
-var original = require('original')
-var parse = require('url').parse
-var events = require('events')
-var https = require('https')
-var http = require('http')
-var util = require('util')
+import original from 'original';
+import { parse } from 'url';
+import { EventEmitter } from 'events';
+import https from 'https';
+import http from 'http';
 
-var httpsOptions = [
-  'pfx', 'key', 'passphrase', 'cert', 'ca', 'ciphers',
-  'rejectUnauthorized', 'secureProtocol', 'servername', 'checkServerIdentity'
-]
-
-var bom = [239, 187, 191]
-var colon = 58
-var space = 32
-var lineFeed = 10
-var carriageReturn = 13
-
-function hasBom (buf) {
-  return bom.every(function (charCode, index) {
-    return buf[index] === charCode
-  })
+export enum EventSourceReadyState {
+  /** The connection has not yet been established, or it was closed and the user agent is reconnecting. */
+  CONNECTING,
+  /** The user agent has an open connection and is dispatching events as it receives them. */
+  OPEN,
+  /** The connection is not open, and the user agent is not trying to reconnect. Either there was a fatal error or the close() method was invoked. */
+  CLOSED
 }
 
-/**
- * Creates a new EventSource object
- *
- * @param {String} url the URL to which to connect
- * @param {Object} [eventSourceInitDict] extra init params. See README for details.
- * @api public
- **/
-function EventSource (url, eventSourceInitDict) {
-  var readyState = EventSource.CONNECTING
-  Object.defineProperty(this, 'readyState', {
-    get: function () {
-      return readyState
+export interface EventSourceInit {
+  /**
+   * Indicates whether the EventSource object was instantiated with CORS credentials set (true), or not (false, the default).
+   *
+   * @default false
+   */
+  withCredentials?: boolean;
+  /**
+   * The interval in milliseconds between reconnection attempts. Set to 0 to disable.
+   *
+   * @default 1000
+   */
+  reconnectionInterval?: number;
+  /**
+   * The headers to define in the HTTP request.
+   */
+  headers?: { [index: string]: string };
+  /**
+   * If HTTPS requests with invalid certificates should be rejected.
+   *
+   * @default true
+   */
+  rejectUnauthorized?: boolean;
+  /**
+   * A HTTP proxy to use in the request
+   */
+  proxy?: string;
+
+  /** HTTPS options */
+  https?: https.RequestOptions;
+}
+
+export default class EventSource extends EventEmitter {
+  // Enums
+  readonly CONNECTING = EventSourceReadyState.CONNECTING;
+  readonly OPEN = EventSourceReadyState.OPEN;
+  readonly CLOSED = EventSourceReadyState.CLOSED;
+  static readonly CONNECTING = EventSourceReadyState.CONNECTING;
+  static readonly OPEN = EventSourceReadyState.OPEN;
+  static readonly CLOSED = EventSourceReadyState.CLOSED;
+
+  // ready state
+  private _readyState: EventSourceReadyState = EventSourceReadyState.CONNECTING;
+
+  // URL
+  private originalUrl: string;
+  private _url: string;
+
+  // Other options
+  private _withCredentials: boolean;
+  private reconnectionInterval: number;
+  private headers: { [index: string]: string };
+  private rejectUnauthorized: boolean;
+  private proxy?: string;
+  private httpsOptions?: https.RequestOptions;
+
+  // event source vars
+  private request?: http.ClientRequest;
+  private connectionInProgress = false;
+  private lastEventId = '';
+
+  // chunk vars
+  private isFirstChunk = false;
+  private chunkBuffer?: Buffer;
+  private discardTrailingNewline = false;
+  private startingPosition = 0;
+  private startingFieldLength = -1;
+
+  // event vars
+  private eventName = '';
+  private data = '';
+
+  /**
+  * Creates a new EventSource object.
+  *
+  * @param url A string giving the URL that will provide the event stream.
+  * @param [eventSourceInitDict] The EventStream options. See README for details.
+  * @api public
+  * */
+  constructor(url: string, eventSourceInitDict: EventSourceInit = {}) {
+    super();
+
+    this.originalUrl = url;
+    this._url = url;
+    this._withCredentials = eventSourceInitDict.withCredentials ?? false;
+    this.reconnectionInterval = eventSourceInitDict.reconnectionInterval ?? 1000;
+    this.headers = {
+      'Cache-Control': 'no-cache',
+      Accept: 'text/event-stream',
+      ...eventSourceInitDict.headers,
+    };
+    this.rejectUnauthorized = eventSourceInitDict.rejectUnauthorized ?? true;
+    this.proxy = eventSourceInitDict.proxy;
+    this.httpsOptions = eventSourceInitDict.https;
+
+    if (this.headers['Last-Event-ID']) {
+      this.lastEventId = this.headers['Last-Event-ID'];
+      delete this.headers['Last-Event-ID'];
     }
-  })
 
-  Object.defineProperty(this, 'url', {
-    get: function () {
-      return url
-    }
-  })
-
-  var self = this
-  self.reconnectInterval = 1000
-  self.connectionInProgress = false
-
-  function onConnectionClosed (message) {
-    if (readyState === EventSource.CLOSED) return
-    readyState = EventSource.CONNECTING
-    _emit('error', new Event('error', {message: message}))
-
-    // The url may have been changed by a temporary
-    // redirect. If that's the case, revert it now.
-    if (reconnectUrl) {
-      url = reconnectUrl
-      reconnectUrl = null
-    }
-    setTimeout(function () {
-      if (readyState !== EventSource.CONNECTING || self.connectionInProgress) {
-        return
-      }
-      self.connectionInProgress = true
-      connect()
-    }, self.reconnectInterval)
+    process.nextTick(() => this.connect());
   }
 
-  var req
-  var lastEventId = ''
-  if (eventSourceInitDict && eventSourceInitDict.headers && eventSourceInitDict.headers['Last-Event-ID']) {
-    lastEventId = eventSourceInitDict.headers['Last-Event-ID']
-    delete eventSourceInitDict.headers['Last-Event-ID']
-  }
-
-  var discardTrailingNewline = false
-  var data = ''
-  var eventName = ''
-
-  var reconnectUrl = null
-
-  function connect () {
-    var options = parse(url)
-    var isSecure = options.protocol === 'https:'
-    options.headers = { 'Cache-Control': 'no-cache', 'Accept': 'text/event-stream' }
-    if (lastEventId) options.headers['Last-Event-ID'] = lastEventId
-    if (eventSourceInitDict && eventSourceInitDict.headers) {
-      for (var i in eventSourceInitDict.headers) {
-        var header = eventSourceInitDict.headers[i]
-        if (header) {
-          options.headers[i] = header
-        }
-      }
+  // eslint-disable-next-line class-methods-use-this
+  private connect(): void {
+    let reqOptions: https.RequestOptions = parse(this._url);
+    let isSecure = reqOptions.protocol === 'https:';
+    reqOptions.headers = this.headers;
+    if (this.lastEventId) {
+      reqOptions.headers['Last-Event-ID'] = this.lastEventId;
     }
 
     // Legacy: this should be specified as `eventSourceInitDict.https.rejectUnauthorized`,
     // but for now exists as a backwards-compatibility layer
-    options.rejectUnauthorized = !(eventSourceInitDict && !eventSourceInitDict.rejectUnauthorized)
-
-    if (eventSourceInitDict && eventSourceInitDict.createConnection !== undefined) {
-      options.createConnection = eventSourceInitDict.createConnection
-    }
+    reqOptions.rejectUnauthorized = this.rejectUnauthorized;
 
     // If specify http proxy, make the request to sent to the proxy server,
     // and include the original url in path and Host headers
-    var useProxy = eventSourceInitDict && eventSourceInitDict.proxy
-    if (useProxy) {
-      var proxy = parse(eventSourceInitDict.proxy)
-      isSecure = proxy.protocol === 'https:'
+    if (this.proxy) {
+      const proxy = parse(this.proxy);
+      isSecure = proxy.protocol === 'https:';
 
-      options.protocol = isSecure ? 'https:' : 'http:'
-      options.path = url
-      options.headers.Host = options.host
-      options.hostname = proxy.hostname
-      options.host = proxy.host
-      options.port = proxy.port
+      reqOptions.protocol = isSecure ? 'https:' : 'http:';
+      reqOptions.path = this._url;
+      reqOptions.headers.Host = reqOptions.host ?? undefined;
+      reqOptions.hostname = proxy.hostname;
+      reqOptions.host = proxy.host;
+      reqOptions.port = proxy.port;
     }
 
     // If https options are specified, merge them into the request options
-    if (eventSourceInitDict && eventSourceInitDict.https) {
-      for (var optName in eventSourceInitDict.https) {
-        if (httpsOptions.indexOf(optName) === -1) {
-          continue
-        }
-
-        var option = eventSourceInitDict.https[optName]
-        if (option !== undefined) {
-          options[optName] = option
-        }
-      }
+    if (this.httpsOptions) {
+      reqOptions = {
+        ...reqOptions,
+        ...this.httpsOptions,
+      };
     }
 
-    // Pass this on to the XHR
-    if (eventSourceInitDict && eventSourceInitDict.withCredentials !== undefined) {
-      options.withCredentials = eventSourceInitDict.withCredentials
+    if (this._withCredentials) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      reqOptions.withCredentials = this._withCredentials;
     }
 
-    req = (isSecure ? https : http).request(options, function (res) {
-      self.connectionInProgress = false
+    this.request = (isSecure ? https : http).request(reqOptions, (res) => {
+      this.connectionInProgress = false;
       // Handle HTTP errors
-      if (res.statusCode === 500 || res.statusCode === 502 || res.statusCode === 503 || res.statusCode === 504) {
-        _emit('error', new Event('error', {status: res.statusCode, message: res.statusMessage}))
-        onConnectionClosed()
-        return
+      if (res.statusCode && res.statusCode >= 500) {
+        this.emit('error', { type: 'error', status: res.statusCode, message: res.statusMessage });
+        this.onConnectionClosed();
+        return;
       }
 
       // Handle HTTP redirects
       if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307) {
         if (!res.headers.location) {
           // Server sent redirect response without Location header.
-          _emit('error', new Event('error', {status: res.statusCode, message: res.statusMessage}))
-          return
+          this.emit('error', { type: 'error', status: res.statusCode, message: 'Server sent redirect response without Location header.' });
+          return;
         }
-        if (res.statusCode === 307) reconnectUrl = url
-        url = res.headers.location
-        process.nextTick(connect)
-        return
+        if (res.statusCode === 301) this.originalUrl = res.headers.location;
+        this._url = res.headers.location;
+        process.nextTick(() => this.connect());
+        return;
       }
 
       if (res.statusCode !== 200) {
-        _emit('error', new Event('error', {status: res.statusCode, message: res.statusMessage}))
-        return self.close()
+        this.emit('error', { type: 'error', status: res.statusCode, message: res.statusMessage });
+        this.close();
+        return;
       }
 
-      readyState = EventSource.OPEN
-      res.on('close', function () {
-        res.removeAllListeners('close')
-        res.removeAllListeners('end')
-        onConnectionClosed()
-      })
+      this._readyState = EventSourceReadyState.OPEN;
 
-      res.on('end', function () {
-        res.removeAllListeners('close')
-        res.removeAllListeners('end')
-        onConnectionClosed()
-      })
-      _emit('open', new Event('open'))
+      res.on('close', () => {
+        res.removeAllListeners('close');
+        res.removeAllListeners('end');
+        this.onConnectionClosed();
+      });
+
+      res.on('end', () => {
+        res.removeAllListeners('close');
+        res.removeAllListeners('end');
+        this.onConnectionClosed();
+      });
+
+      this.emit('open', { type: 'open' });
 
       // text/event-stream parser adapted from webkit's
       // Source/WebCore/page/EventSource.cpp
-      var isFirst = true
-      var buf
-      var startingPos = 0
-      var startingFieldLength = -1
-      res.on('data', function (chunk) {
-        buf = buf ? Buffer.concat([buf, chunk]) : chunk
-        if (isFirst && hasBom(buf)) {
-          buf = buf.slice(bom.length)
-        }
+      this.isFirstChunk = true;
+      this.chunkBuffer = undefined;
+      this.startingPosition = 0;
+      this.startingFieldLength = -1;
+      res.on('data', this.parseDataChunk);
+    });
 
-        isFirst = false
-        var pos = 0
-        var length = buf.length
+    this.request.on('error', (err) => {
+      this.onConnectionClosed(err.message, err);
+    });
 
-        while (pos < length) {
-          if (discardTrailingNewline) {
-            if (buf[pos] === lineFeed) {
-              ++pos
-            }
-            discardTrailingNewline = false
-          }
-
-          var lineLength = -1
-          var fieldLength = startingFieldLength
-          var c
-
-          for (var i = startingPos; lineLength < 0 && i < length; ++i) {
-            c = buf[i]
-            if (c === colon) {
-              if (fieldLength < 0) {
-                fieldLength = i - pos
-              }
-            } else if (c === carriageReturn) {
-              discardTrailingNewline = true
-              lineLength = i - pos
-            } else if (c === lineFeed) {
-              lineLength = i - pos
-            }
-          }
-
-          if (lineLength < 0) {
-            startingPos = length - pos
-            startingFieldLength = fieldLength
-            break
-          } else {
-            startingPos = 0
-            startingFieldLength = -1
-          }
-
-          parseEventStreamLine(buf, pos, fieldLength, lineLength)
-
-          pos += lineLength + 1
-        }
-
-        if (pos === length) {
-          buf = void 0
-        } else if (pos > 0) {
-          buf = buf.slice(pos)
-        }
-      })
-    })
-
-    req.on('error', function (err) {
-      onConnectionClosed(err.message)
-    })
-
-    if (req.setNoDelay) req.setNoDelay(true)
-    req.end()
-  }
-
-  connect()
-
-  function _emit () {
-    if (self.listeners(arguments[0]).length > 0) {
-      self.emit.apply(self, arguments)
+    if (typeof this.request.setNoDelay === 'function') {
+      this.request.setNoDelay(true);
     }
+    this.request.end();
   }
 
-  this._close = function () {
-    if (readyState === EventSource.CLOSED) return
-    readyState = EventSource.CLOSED
-    if (req.abort) req.abort()
-    if (req.xhr && req.xhr.abort) req.xhr.abort()
+  // eslint-disable-next-line class-methods-use-this
+  private hasBom(buffer: Buffer): boolean {
+    return [239, 187, 191].every((charCode, index) => buffer[index] === charCode);
   }
 
-  function parseEventStreamLine (buf, pos, fieldLength, lineLength) {
-    if (lineLength === 0) {
-      if (data.length > 0) {
-        var type = eventName || 'message'
-        _emit(type, new MessageEvent(type, {
-          data: data.slice(0, -1), // remove trailing newline
-          lastEventId: lastEventId,
-          origin: original(url)
-        }))
-        data = ''
+  private parseDataChunk = (chunk: Buffer): void => {
+    this.chunkBuffer = this.chunkBuffer ? Buffer.concat([this.chunkBuffer, chunk]) : chunk;
+    if (this.isFirstChunk && this.hasBom(this.chunkBuffer)) {
+      this.chunkBuffer = this.chunkBuffer.slice(3);
+    }
+
+    this.isFirstChunk = false;
+    let position = 0;
+    const { length } = this.chunkBuffer;
+
+    while (position < length) {
+      if (this.discardTrailingNewline) {
+        if (this.chunkBuffer[position] === 10) {
+          position += 1;
+        }
+        this.discardTrailingNewline = false;
       }
-      eventName = void 0
+
+      let lineLength = -1;
+      let fieldLength = this.startingFieldLength;
+      let character: number;
+
+      for (let i = this.startingPosition; lineLength < 0 && i < length; i += 1) {
+        character = this.chunkBuffer[i];
+        if (character === 58 && fieldLength < 0) {
+          fieldLength = i - position;
+        } else if (character === 13) {
+          this.discardTrailingNewline = true;
+          lineLength = i - position;
+        } else if (character === 10) {
+          lineLength = i - position;
+        }
+      }
+
+      if (lineLength < 0) {
+        this.startingPosition = length - position;
+        this.startingFieldLength = fieldLength;
+        break;
+      } else {
+        this.startingPosition = 0;
+        this.startingFieldLength = -1;
+      }
+
+      this.parseEventStreamLine(this.chunkBuffer, position, fieldLength, lineLength);
+
+      position += lineLength + 1;
+    }
+
+    if (position === length) {
+      this.chunkBuffer = undefined;
+    } else if (position > 0) {
+      this.chunkBuffer = this.chunkBuffer.slice(position);
+    }
+  };
+
+  private parseEventStreamLine(chunkBuffer: Buffer, position: number, fieldLength: number, lineLength: number): void {
+    if (lineLength === 0) {
+      if (this.data) {
+        const type = this.eventName || 'message';
+        this.emit(type, {
+          data: this.data.slice(0, -1), // remove trailing newline
+          lastEventId: this.lastEventId,
+          origin: original(this._url),
+          type,
+        });
+        this.data = '';
+      }
+      this.eventName = '';
     } else if (fieldLength > 0) {
-      var noValue = fieldLength < 0
-      var step = 0
-      var field = buf.slice(pos, pos + (noValue ? lineLength : fieldLength)).toString()
+      const noValue = fieldLength < 0;
+      let step = 0;
+      const field = chunkBuffer.slice(position, position + (noValue ? lineLength : fieldLength)).toString();
 
       if (noValue) {
-        step = lineLength
-      } else if (buf[pos + fieldLength + 1] !== space) {
-        step = fieldLength + 1
+        step = lineLength;
+      } else if (chunkBuffer[position + fieldLength + 1] !== 32) {
+        step = fieldLength + 1;
       } else {
-        step = fieldLength + 2
+        step = fieldLength + 2;
       }
-      pos += step
 
-      var valueLength = lineLength - step
-      var value = buf.slice(pos, pos + valueLength).toString()
+      const valueLength = lineLength - step;
+      const value = chunkBuffer.slice(position + step, position + step + valueLength).toString();
 
       if (field === 'data') {
-        data += value + '\n'
+        this.data += `${value}\n`;
       } else if (field === 'event') {
-        eventName = value
+        this.eventName = value;
       } else if (field === 'id') {
-        lastEventId = value
+        this.lastEventId = value;
       } else if (field === 'retry') {
-        var retry = parseInt(value, 10)
-        if (!Number.isNaN(retry)) {
-          self.reconnectInterval = retry
+        const retry = parseInt(value, 10);
+        if (!Number.isNaN(retry) && this.reconnectionInterval !== 0) {
+          this.reconnectionInterval = retry;
         }
       }
     }
   }
-}
 
-module.exports = EventSource
+  private onConnectionClosed(message?: string, error?: Error): void {
+    if (this._readyState === EventSourceReadyState.CLOSED) return;
+    this._readyState = EventSourceReadyState.CONNECTING;
 
-util.inherits(EventSource, events.EventEmitter)
-EventSource.prototype.constructor = EventSource; // make stacktraces readable
+    this.emit('error', { type: 'error', error, message });
 
-['open', 'error', 'message'].forEach(function (method) {
-  Object.defineProperty(EventSource.prototype, 'on' + method, {
-    /**
-     * Returns the current listener
-     *
-     * @return {Mixed} the set function or undefined
-     * @api private
-     */
-    get: function get () {
-      var listener = this.listeners(method)[0]
-      return listener ? (listener._listener ? listener._listener : listener) : undefined
-    },
+    if (this.reconnectionInterval === 0) return;
 
-    /**
-     * Start listening for events
-     *
-     * @param {Function} listener the listener
-     * @return {Mixed} the set function or undefined
-     * @api private
-     */
-    set: function set (listener) {
-      this.removeAllListeners(method)
-      this.addEventListener(method, listener)
-    }
-  })
-})
+    this._url = this.originalUrl;
 
-/**
- * Ready states
- */
-Object.defineProperty(EventSource, 'CONNECTING', {enumerable: true, value: 0})
-Object.defineProperty(EventSource, 'OPEN', {enumerable: true, value: 1})
-Object.defineProperty(EventSource, 'CLOSED', {enumerable: true, value: 2})
+    setTimeout(() => {
+      if (this._readyState !== EventSourceReadyState.CONNECTING || this.connectionInProgress) return;
 
-EventSource.prototype.CONNECTING = 0
-EventSource.prototype.OPEN = 1
-EventSource.prototype.CLOSED = 2
-
-/**
- * Closes the connection, if one is made, and sets the readyState attribute to 2 (closed)
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/EventSource/close
- * @api public
- */
-EventSource.prototype.close = function () {
-  this._close()
-}
-
-/**
- * Emulates the W3C Browser based WebSocket interface using addEventListener.
- *
- * @param {String} type A string representing the event type to listen out for
- * @param {Function} listener callback
- * @see https://developer.mozilla.org/en/DOM/element.addEventListener
- * @see http://dev.w3.org/html5/websockets/#the-websocket-interface
- * @api public
- */
-EventSource.prototype.addEventListener = function addEventListener (type, listener) {
-  if (typeof listener === 'function') {
-    // store a reference so we can return the original function again
-    listener._listener = listener
-    this.on(type, listener)
+      this.connectionInProgress = true;
+      this.connect();
+    }, this.reconnectionInterval);
   }
-}
 
-/**
- * Emulates the W3C Browser based WebSocket interface using dispatchEvent.
- *
- * @param {Event} event An event to be dispatched
- * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
- * @api public
- */
-EventSource.prototype.dispatchEvent = function dispatchEvent (event) {
-  if (!event.type) {
-    throw new Error('UNSPECIFIED_EVENT_TYPE_ERR')
+  /** Returns the URL providing the event stream. */
+  get url(): string {
+    return this._url;
   }
-  // if event is instance of an CustomEvent (or has 'details' property),
-  // send the detail object as the payload for the event
-  this.emit(event.type, event.detail)
-}
 
-/**
- * Emulates the W3C Browser based WebSocket interface using removeEventListener.
- *
- * @param {String} type A string representing the event type to remove
- * @param {Function} listener callback
- * @see https://developer.mozilla.org/en/DOM/element.removeEventListener
- * @see http://dev.w3.org/html5/websockets/#the-websocket-interface
- * @api public
- */
-EventSource.prototype.removeEventListener = function removeEventListener (type, listener) {
-  if (typeof listener === 'function') {
-    listener._listener = undefined
-    this.removeListener(type, listener)
+  /** Returns true if the credentials mode for connection requests to the URL providing the event stream is set to "include", and false otherwise. */
+  get withCredentials(): boolean {
+    return this._withCredentials;
   }
-}
 
-/**
- * W3C Event
- *
- * @see http://www.w3.org/TR/DOM-Level-3-Events/#interface-Event
- * @api private
- */
-function Event (type, optionalProperties) {
-  Object.defineProperty(this, 'type', { writable: false, value: type, enumerable: true })
-  if (optionalProperties) {
-    for (var f in optionalProperties) {
-      if (optionalProperties.hasOwnProperty(f)) {
-        Object.defineProperty(this, f, { writable: false, value: optionalProperties[f], enumerable: true })
-      }
+  /** Returns the state of this EventSource object's connection. It can have the values described below. */
+  get readyState(): EventSourceReadyState {
+    return this._readyState;
+  }
+
+  set onerror(callback: EventListener) {
+    this.removeAllListeners('error');
+    if (callback != null) {
+      this.on('error', callback);
     }
   }
-}
 
-/**
- * W3C MessageEvent
- *
- * @see http://www.w3.org/TR/webmessaging/#event-definitions
- * @api private
- */
-function MessageEvent (type, eventInitDict) {
-  Object.defineProperty(this, 'type', { writable: false, value: type, enumerable: true })
-  for (var f in eventInitDict) {
-    if (eventInitDict.hasOwnProperty(f)) {
-      Object.defineProperty(this, f, { writable: false, value: eventInitDict[f], enumerable: true })
+  set onmessage(callback: EventListener) {
+    this.removeAllListeners('message');
+    if (callback != null) {
+      this.on('message', callback);
     }
   }
+
+  set onopen(callback: EventListener) {
+    this.removeAllListeners('open');
+    if (callback != null) {
+      this.on('open', callback);
+    }
+  }
+
+  dispatchEvent(event: string | symbol, ...args: unknown[]): void {
+    this.emit(event, ...args);
+  }
+
+  addEventListener(event: string | symbol, listener: (...args: unknown[]) => void): void {
+    this.addListener(event, listener);
+  }
+
+  removeEventListener(event: string | symbol, listener: (...args: unknown[]) => void): void {
+    this.removeListener(event, listener);
+  }
+
+  /** Aborts any instances of the fetch algorithm started for this EventSource object, and sets the readyState attribute to CLOSED. */
+  close(): void {
+    if (this._readyState === EventSourceReadyState.CLOSED) return;
+    this._readyState = EventSourceReadyState.CLOSED;
+    if (typeof this.request?.abort === 'function') this.request.abort();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    if (typeof this.request?.xhr === 'object' && typeof this.request?.xhr.abort === 'function') this.request.xhr.abort();
+  }
 }
+
+module.exports = EventSource;

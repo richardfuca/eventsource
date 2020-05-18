@@ -138,6 +138,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal('€豆腐', m.data)
+        es.close()
         server.close(done)
       }
     })
@@ -152,6 +153,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal('我現在都看實況不玩遊戲', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -165,6 +167,7 @@ describe('Parser', function () {
       var es = new EventSource(server.url)
       es.onmessage = function (m) {
         assert.equal('Hello', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -183,6 +186,7 @@ describe('Parser', function () {
       var es = new EventSource(server.url)
       es.onmessage = function (m) {
         assert.equal('foo', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -196,6 +200,7 @@ describe('Parser', function () {
       var es = new EventSource(server.url)
       es.onmessage = function (m) {
         assert.equal('Hello', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -217,6 +222,7 @@ describe('Parser', function () {
 
       function second (m) {
         assert.equal('World', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -231,6 +237,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal('Hello\nWorld', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -253,6 +260,7 @@ describe('Parser', function () {
 
       function second (m) {
         assert.equal('Hellesøy', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -277,6 +285,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal('Aslak Hellesøy is the original author', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -299,6 +308,7 @@ describe('Parser', function () {
 
       function second (m) {
         assert.equal('Hellesøy', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -321,6 +331,7 @@ describe('Parser', function () {
 
       function second (m) {
         assert.equal('Hellesøy', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -335,6 +346,7 @@ describe('Parser', function () {
 
       es.addEventListener('greeting', function (m) {
         assert.equal('Hello', m.data)
+        es.close()        
         server.close(done)
       })
     })
@@ -357,6 +369,7 @@ describe('Parser', function () {
 
       function scheduleDisconnect () {
         assert.equal(1, numCalled)
+        es.close()        
         server.close(done)
       }
 
@@ -380,6 +393,7 @@ describe('Parser', function () {
 
       function second (m) {
         assert.equal('World', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -401,6 +415,7 @@ describe('Parser', function () {
 
       function second (m) {
         assert.equal('World', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -415,6 +430,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal('line one\n\nline two', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -429,6 +445,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal('\nline one\nline two', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -443,11 +460,12 @@ describe('Parser', function () {
 
       var originalEmit = es.emit
       es.emit = function (event) {
-        assert.ok(event === 'message' || event === 'newListener')
+        assert.ok(event === 'open' || event === 'message' || event === 'newListener')
         return originalEmit.apply(this, arguments)
       }
       es.onmessage = function (m) {
         assert.equal('Hello', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -464,6 +482,7 @@ describe('Parser', function () {
       var es = new EventSource(server.url)
 
       es.onmessage = function () {
+        es.close()        
         server.close(done)
       }
     })
@@ -484,6 +503,7 @@ describe('Parser', function () {
 
       es.onmessage = function (m) {
         assert.equal(longMessageContent, m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -497,10 +517,11 @@ describe('HTTP Request', function () {
 
       server.on('request', function (req) {
         assert.equal('no-cache', req.headers['cache-control'])
+        es.close()
         server.close(done)
       })
 
-      new EventSource(server.url)
+      var es = new EventSource(server.url)
     })
   })
 
@@ -512,6 +533,7 @@ describe('HTTP Request', function () {
         assert.equal(req.headers['user-agent'], 'test')
         assert.equal(req.headers['cookie'], 'test=test')
         assert.equal(req.headers['last-event-id'], '99')
+        es.close()
         server.close(done)
       })
 
@@ -520,7 +542,7 @@ describe('HTTP Request', function () {
         'Cookie': 'test=test',
         'Last-Event-ID': '99'
       }
-      new EventSource(server.url, {headers: headers})
+      var es = new EventSource(server.url, {headers: headers})
     })
   })
 
@@ -528,11 +550,14 @@ describe('HTTP Request', function () {
     createServer(function (err, server) {
       if (err) return done(err)
 
+      var es
+
       server.on('request', function (req) {
         assert.equal(req.headers['user-agent'], 'test')
         assert.equal(req.headers['cookie'], 'test=test')
         assert.equal(req.headers['last-event-id'], '99')
         assert.equal(req.headers['X-Something'], undefined)
+        es.close()
         server.close(done)
       })
 
@@ -545,7 +570,7 @@ describe('HTTP Request', function () {
 
       assert.doesNotThrow(
         function () {
-          new EventSource(server.url, {headers: headers})
+          es = new EventSource(server.url, {headers: headers})
         }
       )
     })
@@ -576,7 +601,8 @@ describe('HTTP Request', function () {
         es.onopen = function () {
           assert.ok(clientRequestedRedirectUrl)
           assert.equal(server.url + redirectSuffix, es.url)
-          server.close(done)
+          es.close()        
+        server.close(done)
         }
       })
     })
@@ -595,8 +621,9 @@ describe('HTTP Request', function () {
         var es = new EventSource(server.url)
         es.onerror = function (err) {
           assert.equal(err.status, status)
-          assert.equal(err.message, 'status message')
-          server.close(done)
+          assert.equal(err.message, 'Server sent redirect response without Location header.')
+          es.close()        
+        server.close(done)
         }
       })
     })
@@ -616,32 +643,8 @@ describe('HTTP Request', function () {
         es.onerror = function (err) {
           assert.equal(err.status, status)
           assert.equal(err.message, 'status message')
+          es.close()        
           server.close(done)
-        }
-      })
-    })
-  })
-
-  it('checks createConnection option', function (done) {
-    createServer(function (err, server) {
-      if (err) return done(err)
-
-      var testResult = false
-
-      server.on('request', function () {
-        assert.ok(testResult)
-        server.close(done)
-      })
-
-      var urlObj = u.parse(server.url)
-
-      new EventSource(server.url, {
-        createConnection: function () {
-          var connection = net.createConnection({ port: urlObj.port, host: urlObj.hostname })
-          connection.on('connect', function () {
-            testResult = true
-          })
-          return connection
         }
       })
     })
@@ -658,6 +661,7 @@ describe('HTTPS Support', function () {
 
       es.onmessage = function (m) {
         assert.equal('hello', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -684,6 +688,7 @@ describe('HTTPS Client Certificate Support', function () {
       )
       es.onmessage = function (m) {
         assert.equal('hello', m.data)
+        es.close()        
         server.close(done)
       }
     })
@@ -692,8 +697,7 @@ describe('HTTPS Client Certificate Support', function () {
 
 describe('Reconnection', function () {
   it('is attempted when server is down', function (done) {
-    var es = new EventSource('http://localhost:' + _port)
-    es.reconnectInterval = 0
+    var es = new EventSource('http://localhost:' + _port, { reconnectionInterval: 10 })
 
     es.onerror = function () {
       es.onerror = null
@@ -704,7 +708,8 @@ describe('Reconnection', function () {
 
         es.onmessage = function (m) {
           assert.equal('hello', m.data)
-          server.close(done)
+          es.close()        
+        server.close(done)
         }
       })
     }
@@ -715,8 +720,9 @@ describe('Reconnection', function () {
       if (err) return done(err)
 
       server.on('request', writeEvents(['data: hello\n\n']))
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
+
+      es.onerror = () => {}
 
       es.onmessage = function (m) {
         assert.equal('hello', m.data)
@@ -747,8 +753,7 @@ describe('Reconnection', function () {
         res.end()
       })
 
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
 
       var errored = false
 
@@ -778,8 +783,7 @@ describe('Reconnection', function () {
       if (err) return done(err)
 
       server.on('request', writeEvents(['data: hello\n\n']))
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
 
       es.onmessage = function (m) {
         assert.equal('hello', m.data)
@@ -823,8 +827,7 @@ describe('Reconnection', function () {
         res.end()
       })
 
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
 
       es.onerror = function (e) {
         assert.equal(e.status, 204)
@@ -860,8 +863,9 @@ describe('Reconnection', function () {
 
       server.on('request', writeEvents(['id: 10\ndata: Hello\n\n']))
 
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
+
+      es.onerror = () => {}
 
       es.onmessage = function () {
         server.close(function (err) {
@@ -887,10 +891,11 @@ describe('Reconnection', function () {
 
       server.on('request', function (req, res) {
         assert.equal('9', req.headers['last-event-id'])
+        es.close()        
         server.close(done)
       })
 
-      new EventSource(server.url, {headers: {'Last-Event-ID': '9'}})
+      var es = new EventSource(server.url, {headers: {'Last-Event-ID': '9'}})
     })
   })
 
@@ -900,8 +905,9 @@ describe('Reconnection', function () {
 
       server.on('request', writeEvents(['data: Hello\n\n']))
 
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
+
+      es.onerror = () => {}
 
       es.onmessage = function () {
         server.close(function (err) {
@@ -938,13 +944,13 @@ describe('Reconnection', function () {
         } else {
           assert.equal(EventSource.CONNECTING, es.readyState)
           assert.ok(errorOccurred)
-          server.close(done)
+          es.close()        
+        server.close(done)
         }
       })
 
-      var es = new EventSource(server.url)
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
       assert.equal(EventSource.CONNECTING, es.readyState)
-      es.reconnectInterval = 0
       es.onerror = function (err) {
         errorOccurred = !!(errorOccurred || err)
       }
@@ -991,8 +997,7 @@ describe('readyState', function () {
       if (err) return done(err)
 
       server.on('request', writeEvents([]))
-      var es = new EventSource(server.url)
-      es.reconnectInterval = 0
+      var es = new EventSource(server.url, { reconnectionInterval: 10 })
 
       es.onopen = function (m) {
         server.close(function (err) {
@@ -1017,6 +1022,7 @@ describe('readyState', function () {
 
       es.onopen = function () {
         assert.equal(EventSource.OPEN, es.readyState)
+        es.close()        
         server.close(done)
       }
     })
@@ -1032,6 +1038,7 @@ describe('readyState', function () {
       es.onopen = function () {
         es.close()
         assert.equal(EventSource.CLOSED, es.readyState)
+        es.close()        
         server.close(done)
       }
     })
@@ -1042,10 +1049,11 @@ describe('Methods', function () {
   it('close method exists and can be called to close an eventsource', function (done) {
     createServer(function (err, server) {
       if (err) return done(err)
-      var es = new EventSource(server.url)
       server.on('request', writeEvents([]))
+      var es = new EventSource(server.url, { reconnectionInterval: 0 })
       es.onopen = function () {
         assert.equal(es.close(), undefined)
+        assert.equal(es.readyState, EventSource.CLOSED)
         server.close(done)
       }
     })
@@ -1060,6 +1068,7 @@ describe('Properties', function () {
   it('url exposes original request url', function () {
     var url = 'http://localhost:' + _port
     var es = new EventSource(url)
+    es.onerror = () => {}
     assert.equal(url, es.url)
   })
 })
@@ -1074,6 +1083,7 @@ describe('Events', function () {
 
       es.onopen = function (event) {
         assert.equal(event.type, 'open')
+        es.close()        
         server.close(done)
       }
     })
@@ -1088,6 +1098,7 @@ describe('Events', function () {
 
       es.onmessage = function (event) {
         assert.equal(event.origin, server.url)
+        es.close()        
         server.close(done)
       }
     })
@@ -1102,6 +1113,7 @@ describe('Events', function () {
 
       es.addEventListener('open', function (event) {
         assert.equal(event.type, 'open')
+        es.close()        
         server.close(done)
       })
     })
@@ -1124,10 +1136,12 @@ describe('Events', function () {
           })
         }
       })
-      const es = new EventSource(server.url)
-      es.reconnectInterval = 50
+      const es = new EventSource(server.url, { reconnectionInterval: 50 })
+
+      es.onerror = () => {}
 
       setTimeout(function () {
+        es.close()        
         server.close(done)
       }, 350)
     })
@@ -1143,7 +1157,8 @@ describe('Events', function () {
       es.addEventListener('open', function () {
         es.close()
         process.nextTick(function () {
-          server.close(done)
+          es.close()        
+        server.close(done)
         })
       })
       es.addEventListener('error', function () {
@@ -1161,6 +1176,7 @@ describe('Events', function () {
 
       es.onmessage = function (m) {
         assert.equal(m.lastEventId, '123')
+        es.close()        
         server.close(done)
       }
     })
@@ -1182,6 +1198,7 @@ describe('Events', function () {
       function second (m) {
         assert.equal(m.data, 'World')
         assert.equal(m.lastEventId, '123')  // expect to get back the previous event id
+        es.close()        
         server.close(done)
       }
     })
@@ -1198,6 +1215,7 @@ describe('Events', function () {
         var enumerableAttributes = Object.keys(m)
         assert.notEqual(enumerableAttributes.indexOf('data'), -1)
         assert.notEqual(enumerableAttributes.indexOf('type'), -1)
+        es.close()        
         server.close(done)
       }
     })
@@ -1214,6 +1232,7 @@ describe('Events', function () {
       assert.throws(function () { es.dispatchEvent({type: ''}) })
       assert.throws(function () { es.dispatchEvent({type: null}) })
 
+      es.close();
       server.close(done)
     })
   })
@@ -1225,6 +1244,7 @@ describe('Events', function () {
       var es = new EventSource(server.url)
 
       es.addEventListener('greeting', function (m) {
+        es.close()        
         server.close(done)
       })
 
@@ -1240,6 +1260,7 @@ describe('Events', function () {
 
       es.addEventListener('greeting', function (m) {
         assert.equal('Hello', m.data)
+        es.close()        
         server.close(done)
       })
 
@@ -1262,7 +1283,8 @@ describe('Proxying', function () {
         es.onmessage = function (m) {
           assert.equal(m.data, 'World')
           proxy.close(function () {
-            server.close(done)
+            es.close()        
+        server.close(done)
           })
         }
       })
@@ -1282,7 +1304,8 @@ describe('Proxying', function () {
         es.onmessage = function (m) {
           assert.equal(m.data, 'World')
           proxy.close(function () {
-            server.close(done)
+            es.close()        
+        server.close(done)
           })
         }
       })
@@ -1302,7 +1325,8 @@ describe('Proxying', function () {
         es.onmessage = function (m) {
           assert.equal(m.data, 'World')
           proxy.close(function () {
-            server.close(done)
+            es.close()        
+        server.close(done)
           })
         }
       })

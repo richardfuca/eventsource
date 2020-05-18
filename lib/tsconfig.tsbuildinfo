@@ -1,6 +1,11 @@
 {
   "program": {
     "fileInfos": {
+      "../node_modules/typescript/lib/lib.d.ts": {
+        "version": "2dc8c927c9c162a773c6bb3cdc4f3286c23f10eedc67414028f9cb5951610f60",
+        "signature": "2dc8c927c9c162a773c6bb3cdc4f3286c23f10eedc67414028f9cb5951610f60",
+        "affectsGlobalScope": false
+      },
       "../node_modules/typescript/lib/lib.es5.d.ts": {
         "version": "70ae6416528e68c2ee7b62892200d2ca631759943d4429f8b779b947ff1e124d",
         "signature": "70ae6416528e68c2ee7b62892200d2ca631759943d4429f8b779b947ff1e124d",
@@ -29,11 +34,6 @@
       "../node_modules/typescript/lib/lib.dom.d.ts": {
         "version": "9affb0a2ddc57df5b8174c0af96c288d697a262e5bc9ca1f544c999dc64a91e6",
         "signature": "9affb0a2ddc57df5b8174c0af96c288d697a262e5bc9ca1f544c999dc64a91e6",
-        "affectsGlobalScope": true
-      },
-      "../node_modules/typescript/lib/lib.dom.iterable.d.ts": {
-        "version": "fb0c09b697dc42afa84d1587e3c994a2f554d2a45635e4f0618768d16a86b69a",
-        "signature": "fb0c09b697dc42afa84d1587e3c994a2f554d2a45635e4f0618768d16a86b69a",
         "affectsGlobalScope": true
       },
       "../node_modules/typescript/lib/lib.webworker.importscripts.d.ts": {
@@ -156,15 +156,15 @@
         "signature": "89bf2b7a601b73ea4311eda9c41f86a58994fec1bee3b87c4a14d68d9adcdcbd",
         "affectsGlobalScope": true
       },
-      "../node_modules/typescript/lib/lib.es2016.full.d.ts": {
-        "version": "2dfbb27de6bf0db1018122b054d26cf1fc47bc1979d096aec101b08a42c63b13",
-        "signature": "2dfbb27de6bf0db1018122b054d26cf1fc47bc1979d096aec101b08a42c63b13",
+      "../node_modules/@types/original/index.d.ts": {
+        "version": "10f425e0f279af34612fa04d064603aac37caaea14284994a65faab0ce18a456",
+        "signature": "10f425e0f279af34612fa04d064603aac37caaea14284994a65faab0ce18a456",
         "affectsGlobalScope": false
       },
       "../src/eventsource.ts": {
-        "version": "cf1e0b25e0dfdf3e8f5bdc90f89f43ece9ade8850bb4f06f860ae3d79c69f92b",
-        "signature": "8a7359de048658ab021c3a6dae352eb0f742b0f128001d4c73e9246aaa1e587e",
-        "affectsGlobalScope": true
+        "version": "b670b42313011f9d263f8cfd1c4328d3e3b33f6fc1fdc27dcdf05b8f0a350bdf",
+        "signature": "fe9e157a0008be913f838c2f8f89f67e02b9a454c7aa02de735dd3e26d741c46",
+        "affectsGlobalScope": false
       },
       "../node_modules/@types/color-name/index.d.ts": {
         "version": "f0cb4b3ab88193e3e51e9e2622e4c375955003f1f81239d72c5b7a95415dad3e",
@@ -434,19 +434,21 @@
     },
     "options": {
       "module": 1,
-      "target": 3,
+      "target": 1,
       "noImplicitAny": true,
       "strict": true,
       "strictNullChecks": true,
       "removeComments": true,
       "preserveConstEnums": true,
       "noUnusedLocals": true,
-      "importHelpers": true,
       "noUnusedParameters": true,
       "esModuleInterop": true,
       "allowJs": false,
       "incremental": true,
       "outDir": "./",
+      "declaration": true,
+      "project": "../tsconfig.json",
+      "watch": true,
       "configFilePath": "../tsconfig.json"
     },
     "referencedMap": {
@@ -865,13 +867,19 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/typescript/lib/lib.dom.d.ts": [
+      "../node_modules/@types/original/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/typescript/lib/lib.dom.iterable.d.ts": [
+      "../node_modules/typescript/lib/lib.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
+      "../node_modules/typescript/lib/lib.dom.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
@@ -944,12 +952,6 @@
         "../node_modules/@types/node/util.d.ts"
       ],
       "../node_modules/typescript/lib/lib.es2016.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
-      ],
-      "../node_modules/typescript/lib/lib.es2016.full.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
@@ -1058,10 +1060,15 @@
         "../node_modules/@types/node/util.d.ts"
       ],
       "../src/eventsource.ts": [
+        "../node_modules/@types/node/events.d.ts",
         "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/http.d.ts",
+        "../node_modules/@types/node/https.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
+        "../node_modules/@types/node/url.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/original/index.d.ts"
       ]
     },
     "exportedModulesMap": {
@@ -1462,13 +1469,19 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/typescript/lib/lib.dom.d.ts": [
+      "../node_modules/@types/original/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/typescript/lib/lib.dom.iterable.d.ts": [
+      "../node_modules/typescript/lib/lib.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
+      "../node_modules/typescript/lib/lib.dom.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
@@ -1541,12 +1554,6 @@
         "../node_modules/@types/node/util.d.ts"
       ],
       "../node_modules/typescript/lib/lib.es2016.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
-      ],
-      "../node_modules/typescript/lib/lib.es2016.full.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
@@ -1653,6 +1660,10 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
+      ],
+      "../src/eventsource.ts": [
+        "../node_modules/@types/node/events.d.ts",
+        "../node_modules/@types/node/https.d.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -1709,120 +1720,9 @@
       "../node_modules/@types/node/vm.d.ts",
       "../node_modules/@types/node/worker_threads.d.ts",
       "../node_modules/@types/node/zlib.d.ts",
-      [
-        "../node_modules/typescript/lib/lib.dom.d.ts",
-        [
-          {
-            "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-            "start": 176983,
-            "length": 5,
-            "messageText": "Duplicate identifier 'Event'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 12438,
-                "length": 5,
-                "messageText": "'Event' was also declared here.",
-                "category": 3,
-                "code": 6203
-              }
-            ]
-          },
-          {
-            "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-            "start": 180077,
-            "length": 5,
-            "messageText": "Duplicate identifier 'Event'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 12438,
-                "length": 5,
-                "messageText": "'Event' was also declared here.",
-                "category": 3,
-                "code": 6203
-              }
-            ]
-          },
-          {
-            "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-            "start": 180486,
-            "length": 11,
-            "messageText": "Duplicate identifier 'EventSource'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 761,
-                "length": 11,
-                "messageText": "'EventSource' was also declared here.",
-                "category": 3,
-                "code": 6203
-              }
-            ]
-          },
-          {
-            "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-            "start": 182070,
-            "length": 11,
-            "messageText": "Duplicate identifier 'EventSource'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 761,
-                "length": 11,
-                "messageText": "'EventSource' was also declared here.",
-                "category": 3,
-                "code": 6203
-              }
-            ]
-          },
-          {
-            "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-            "start": 404679,
-            "length": 12,
-            "messageText": "Duplicate identifier 'MessageEvent'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 12927,
-                "length": 12,
-                "messageText": "'MessageEvent' was also declared here.",
-                "category": 3,
-                "code": 6203
-              }
-            ]
-          },
-          {
-            "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-            "start": 405480,
-            "length": 12,
-            "messageText": "Duplicate identifier 'MessageEvent'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 12927,
-                "length": 12,
-                "messageText": "'MessageEvent' was also declared here.",
-                "category": 3,
-                "code": 6203
-              }
-            ]
-          }
-        ]
-      ],
-      "../node_modules/typescript/lib/lib.dom.iterable.d.ts",
+      "../node_modules/@types/original/index.d.ts",
+      "../node_modules/typescript/lib/lib.d.ts",
+      "../node_modules/typescript/lib/lib.dom.d.ts",
       "../node_modules/typescript/lib/lib.es2015.collection.d.ts",
       "../node_modules/typescript/lib/lib.es2015.core.d.ts",
       "../node_modules/typescript/lib/lib.es2015.d.ts",
@@ -1835,7 +1735,6 @@
       "../node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
       "../node_modules/typescript/lib/lib.es2016.array.include.d.ts",
       "../node_modules/typescript/lib/lib.es2016.d.ts",
-      "../node_modules/typescript/lib/lib.es2016.full.d.ts",
       "../node_modules/typescript/lib/lib.es2017.d.ts",
       "../node_modules/typescript/lib/lib.es2017.intl.d.ts",
       "../node_modules/typescript/lib/lib.es2017.object.d.ts",
@@ -1853,680 +1752,7 @@
       "../node_modules/typescript/lib/lib.esnext.intl.d.ts",
       "../node_modules/typescript/lib/lib.scripthost.d.ts",
       "../node_modules/typescript/lib/lib.webworker.importscripts.d.ts",
-      [
-        "../src/eventsource.ts",
-        [
-          {
-            "file": "../src/eventsource.ts",
-            "start": 456,
-            "length": 3,
-            "messageText": "Parameter 'buf' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 761,
-            "length": 11,
-            "messageText": "Duplicate identifier 'EventSource'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 180486,
-                "length": 11,
-                "messageText": "'EventSource' was also declared here.",
-                "category": 3,
-                "code": 6203
-              },
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 182070,
-                "length": 11,
-                "messageText": "and here.",
-                "category": 3,
-                "code": 6204
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 774,
-            "length": 3,
-            "messageText": "Parameter 'url' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 779,
-            "length": 19,
-            "messageText": "Parameter 'eventSourceInitDict' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 868,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 973,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1053,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1158,
-            "length": 7,
-            "messageText": "Parameter 'message' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1269,
-            "length": 47,
-            "messageText": "Expected 0 arguments, but got 2.",
-            "category": 1,
-            "code": 2554
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1298,
-            "length": 16,
-            "code": 2345,
-            "category": 1,
-            "messageText": {
-              "messageText": "Argument of type '{ message: any; }' is not assignable to parameter of type 'EventInit'.",
-              "category": 1,
-              "code": 2345,
-              "next": [
-                {
-                  "messageText": "Object literal may only specify known properties, and 'message' does not exist in type 'EventInit'.",
-                  "category": 1,
-                  "code": 2353
-                }
-              ]
-            }
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1431,
-            "length": 12,
-            "messageText": "Variable 'reconnectUrl' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1459,
-            "length": 12,
-            "messageText": "Variable 'reconnectUrl' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 1733,
-            "length": 3,
-            "messageText": "Variable 'req' implicitly has type 'any' in some locations where its type cannot be determined.",
-            "category": 1,
-            "code": 7034
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 2073,
-            "length": 12,
-            "messageText": "Variable 'reconnectUrl' implicitly has type 'any' in some locations where its type cannot be determined.",
-            "category": 1,
-            "code": 7034
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 4246,
-            "length": 3,
-            "messageText": "Parameter 'res' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 4449,
-            "length": 81,
-            "messageText": "Expected 0 arguments, but got 2.",
-            "category": 1,
-            "code": 2554
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 4478,
-            "length": 22,
-            "code": 2345,
-            "category": 1,
-            "messageText": {
-              "messageText": "Argument of type '{ status: any; message: any; }' is not assignable to parameter of type 'EventInit'.",
-              "category": 1,
-              "code": 2345,
-              "next": [
-                {
-                  "messageText": "Object literal may only specify known properties, and 'status' does not exist in type 'EventInit'.",
-                  "category": 1,
-                  "code": 2353
-                }
-              ]
-            }
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 4540,
-            "length": 20,
-            "messageText": "Expected 1 arguments, but got 0.",
-            "category": 1,
-            "code": 2554,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 1158,
-                "length": 7,
-                "messageText": "An argument for 'message' was not provided.",
-                "category": 3,
-                "code": 6210
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 4825,
-            "length": 81,
-            "messageText": "Expected 0 arguments, but got 2.",
-            "category": 1,
-            "code": 2554
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 4854,
-            "length": 22,
-            "code": 2345,
-            "category": 1,
-            "messageText": {
-              "messageText": "Argument of type '{ status: any; message: any; }' is not assignable to parameter of type 'EventInit'.",
-              "category": 1,
-              "code": 2345,
-              "next": [
-                {
-                  "messageText": "Object literal may only specify known properties, and 'status' does not exist in type 'EventInit'.",
-                  "category": 1,
-                  "code": 2353
-                }
-              ]
-            }
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5133,
-            "length": 81,
-            "messageText": "Expected 0 arguments, but got 2.",
-            "category": 1,
-            "code": 2554
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5162,
-            "length": 22,
-            "code": 2345,
-            "category": 1,
-            "messageText": {
-              "messageText": "Argument of type '{ status: any; message: any; }' is not assignable to parameter of type 'EventInit'.",
-              "category": 1,
-              "code": 2345,
-              "next": [
-                {
-                  "messageText": "Object literal may only specify known properties, and 'status' does not exist in type 'EventInit'.",
-                  "category": 1,
-                  "code": 2353
-                }
-              ]
-            }
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5411,
-            "length": 20,
-            "messageText": "Expected 1 arguments, but got 0.",
-            "category": 1,
-            "code": 2554,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 1158,
-                "length": 7,
-                "messageText": "An argument for 'message' was not provided.",
-                "category": 3,
-                "code": 6210
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5562,
-            "length": 20,
-            "messageText": "Expected 1 arguments, but got 0.",
-            "category": 1,
-            "code": 2554,
-            "relatedInformation": [
-              {
-                "file": "../src/eventsource.ts",
-                "start": 1158,
-                "length": 7,
-                "messageText": "An argument for 'message' was not provided.",
-                "category": 3,
-                "code": 6210
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5604,
-            "length": 25,
-            "messageText": "Expected 0 arguments, but got 2.",
-            "category": 1,
-            "code": 2554
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5768,
-            "length": 3,
-            "messageText": "Variable 'buf' implicitly has type 'any' in some locations where its type cannot be determined.",
-            "category": 1,
-            "code": 7034
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5864,
-            "length": 5,
-            "messageText": "Parameter 'chunk' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5887,
-            "length": 3,
-            "messageText": "Variable 'buf' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 5908,
-            "length": 3,
-            "messageText": "Variable 'buf' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7350,
-            "length": 3,
-            "messageText": "Parameter 'err' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7605,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7727,
-            "length": 3,
-            "messageText": "Variable 'req' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7738,
-            "length": 3,
-            "messageText": "Variable 'req' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7758,
-            "length": 3,
-            "messageText": "Variable 'req' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7769,
-            "length": 3,
-            "messageText": "Variable 'req' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7784,
-            "length": 3,
-            "messageText": "Variable 'req' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7005
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7838,
-            "length": 3,
-            "messageText": "Parameter 'buf' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7843,
-            "length": 3,
-            "messageText": "Parameter 'pos' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7848,
-            "length": 11,
-            "messageText": "Parameter 'fieldLength' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7861,
-            "length": 10,
-            "messageText": "Parameter 'lineLength' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 7988,
-            "length": 171,
-            "messageText": "Expected 0 arguments, but got 2.",
-            "category": 1,
-            "code": 2554
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 8193,
-            "length": 9,
-            "code": 2322,
-            "category": 1,
-            "messageText": "Type 'undefined' is not assignable to type 'string'."
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 10242,
-            "length": 10,
-            "messageText": "Cannot assign to 'CONNECTING' because it is a read-only property.",
-            "category": 1,
-            "code": 2540
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 10279,
-            "length": 4,
-            "messageText": "Cannot assign to 'OPEN' because it is a read-only property.",
-            "category": 1,
-            "code": 2540
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 10310,
-            "length": 6,
-            "messageText": "Cannot assign to 'CLOSED' because it is a read-only property.",
-            "category": 1,
-            "code": 2540
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 10564,
-            "length": 6,
-            "code": 2551,
-            "category": 1,
-            "messageText": "Property '_close' does not exist on type 'EventSource'. Did you mean 'close'?",
-            "relatedInformation": [
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 181315,
-                "length": 14,
-                "messageText": "'close' is declared here.",
-                "category": 3,
-                "code": 2728
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 11004,
-            "length": 4,
-            "messageText": "Parameter 'type' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 11010,
-            "length": 8,
-            "messageText": "Parameter 'listener' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 11175,
-            "length": 2,
-            "code": 2339,
-            "category": 1,
-            "messageText": "Property 'on' does not exist on type 'EventSource'."
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 11435,
-            "length": 35,
-            "code": 2322,
-            "category": 1,
-            "messageText": {
-              "messageText": "Type '(event: Event) => void' is not assignable to type '(event: Event) => boolean'.",
-              "category": 1,
-              "code": 2322,
-              "next": [
-                {
-                  "messageText": "Type 'void' is not assignable to type 'boolean'.",
-                  "category": 1,
-                  "code": 2322
-                }
-              ]
-            }
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 11718,
-            "length": 4,
-            "code": 2339,
-            "category": 1,
-            "messageText": "Property 'emit' does not exist on type 'EventSource'."
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 11741,
-            "length": 6,
-            "code": 2339,
-            "category": 1,
-            "messageText": "Property 'detail' does not exist on type 'Event'."
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12184,
-            "length": 4,
-            "messageText": "Parameter 'type' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12190,
-            "length": 8,
-            "messageText": "Parameter 'listener' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12286,
-            "length": 14,
-            "code": 2339,
-            "category": 1,
-            "messageText": "Property 'removeListener' does not exist on type 'EventSource'."
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12438,
-            "length": 5,
-            "messageText": "Duplicate identifier 'Event'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 176983,
-                "length": 5,
-                "messageText": "'Event' was also declared here.",
-                "category": 3,
-                "code": 6203
-              },
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 180077,
-                "length": 5,
-                "messageText": "and here.",
-                "category": 3,
-                "code": 6204
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12445,
-            "length": 4,
-            "messageText": "Parameter 'type' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12451,
-            "length": 18,
-            "messageText": "Parameter 'optionalProperties' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12497,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12711,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12927,
-            "length": 12,
-            "messageText": "Duplicate identifier 'MessageEvent'.",
-            "category": 1,
-            "code": 2300,
-            "relatedInformation": [
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 404679,
-                "length": 12,
-                "messageText": "'MessageEvent' was also declared here.",
-                "category": 3,
-                "code": 6203
-              },
-              {
-                "file": "../node_modules/typescript/lib/lib.dom.d.ts",
-                "start": 405480,
-                "length": 12,
-                "messageText": "and here.",
-                "category": 3,
-                "code": 6204
-              }
-            ]
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12941,
-            "length": 4,
-            "messageText": "Parameter 'type' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12947,
-            "length": 13,
-            "messageText": "Parameter 'eventInitDict' implicitly has an 'any' type.",
-            "category": 1,
-            "code": 7006
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 12988,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          },
-          {
-            "file": "../src/eventsource.ts",
-            "start": 13158,
-            "length": 4,
-            "messageText": "'this' implicitly has type 'any' because it does not have a type annotation.",
-            "category": 1,
-            "code": 2683
-          }
-        ]
-      ]
+      "../src/eventsource.ts"
     ]
   },
   "version": "3.9.2"

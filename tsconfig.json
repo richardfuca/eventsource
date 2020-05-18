@@ -2,19 +2,19 @@
   "compileOnSave": false,
   "compilerOptions": {
     "module": "commonjs",
-    "target": "ES2016",
+    "target": "ES5",
     "noImplicitAny": true,
     "strict": true,
     "strictNullChecks": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "noUnusedLocals": true,
-    "importHelpers": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
     "allowJs": false,
     "incremental": true,
-    "outDir": "lib"
+    "outDir": "lib",
+    "declaration": true
   },
   "include": [
     "src/**/*"

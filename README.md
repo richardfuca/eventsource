@@ -10,6 +10,15 @@ You can use it with Node.js.  Use the [original package](https://github.com/Even
 
 ## Extensions to the W3C API
 
+### Adjusting reconnection interval
+
+You can customize the interval between reconnections via the `reconnectionInterval` argument. It can also be disabled by setting it to `0`.
+
+```javascript
+var eventSourceInitDict = {reconnectionInterval: 5000};
+var es = new EventSource(url, eventSourceInitDict);
+```
+
 ### Setting HTTP request headers
 
 You can define custom HTTP headers for the initial HTTP request. This can be useful for e.g. sending cookies

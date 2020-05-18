@@ -10,7 +10,10 @@ node_js:
 jobs:
   include:
     - stage: build
+      name: "Typescript Build"
       script: npm run build
     - stage: test
+      name: "Tests"
       script: npm run test
     - script: npm run lint
+      name: "Linting"
